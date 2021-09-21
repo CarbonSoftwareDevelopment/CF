@@ -3,7 +3,6 @@ const smtpttransport = require('nodemailer-smtp-transport');
 const hbs = require('nodemailer-express-handlebars');
 const inlineBase64 = require('nodemailer-plugin-inline-base64');
 const EmailError = require('./EmailError');
-const config = require('../../config/config');
 const TimeAgo = require('javascript-time-ago');
 const en = require('javascript-time-ago/locale/en');
 TimeAgo.addLocale(en);
@@ -51,7 +50,7 @@ class Mailer {
       this.mailer.sendMail({
         from: that.emailFrom,
         to: toEmail,
-        bcc: config.bccEmail,
+        bcc: process.env.BCC_EMAIL,
         subject: subject,
         template: templateName,
         context: context

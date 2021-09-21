@@ -4,9 +4,12 @@ const express = require('express'),
   cors = require('cors'),
   mongoose = require('mongoose'),
   http = require('http'),
-  fallback = require('express-history-api-fallback'),
-  config = require('./config/config'),
-  Scheduler = require ('./server/cron/scheduler');
+  Scheduler = require ('./cron/scheduler'),
+  dotenv = require('dotenv');
+
+dotenv.config();
+
+console.log(process.env.NODE_ENV);
 
 mongoose.Promise = global.Promise;
 const mongooseOptions = {
@@ -18,17 +21,16 @@ const mongooseOptions = {
   ha: true, // Make sure the high availability checks are on
   haInterval: 5000, // Run every 5 seconds
 };
-mongoose.connect(config.DB, mongooseOptions).then(
+mongoose.connect(process.env.DB, mongooseOptions).then(
   () => {console.log('Database is connected') },
   err => { console.log('Can not connect to the database'+ err)}
 );
-const userRoutes = require('./server/routes/user.route');
-const root = __dirname + '/dist/ConveyFeed';
+const userRoutes = require('./routes/user.route');
 const app = express();
-const sheduler = new Scheduler(config.host);
+const sheduler = new Scheduler(process.env.HOST);
 app.use(bodyParser.json());
 app.use(cors());
-const port = process.env.PORT || 4000;
+const port = process.env.PORT;
 app.use((err, req, res, next) => {
   console.log(err);
   console.log('error : ;');
@@ -39,9 +41,6 @@ app.use((err, req, res, next) => {
   })
 });
 app.use('/user', userRoutes);
-app.use(express.static(root));
-app.use(fallback('dist/ConveyFeed/index.html', { root : __dirname}));
-
 
 const server = http.createServer(app);
 server.listen(port, () => {

@@ -1,6 +1,3 @@
-let request = require('request');
-let http = require('http');
-const config = require('../../config/config');
 const xml2js = require('xml2js');
 const soapRequest = require('easy-soap-request');
 
@@ -12,12 +9,12 @@ class Sms {
     };
   }
   login() {
-    let loginBody = {api_action: 'login', api_username: config.smsApiUsername, api_password: config.smsApiPassword};
+    let loginBody = {api_action: 'login', api_username: process.env.SMS_USERNAME, api_password: process.env.SMS_PASSWORD};
     let builder = new xml2js.Builder({rootName: 'sms_api'});
     let xml = builder.buildObject(loginBody);
     return (async () => {
       try {
-        const { response } = await soapRequest(config.smsApiUrl, this.headers, xml);
+        const { response } = await soapRequest(process.env.SMS_API_URL, this.headers, xml);
         let parser = new xml2js.Parser();
         parser.parseString(response.body, (err, res) => {
           // parse xml response
@@ -42,7 +39,7 @@ class Sms {
     let xml = builder.buildObject(loginBody);
     return (async () => {
       try {
-        const { response } = await soapRequest(config.smsApiUrl, this.headers, xml);
+        const { response } = await soapRequest(process.env.SMS_API_URL, this.headers, xml);
         let parser = new xml2js.Parser();
         parser.parseString(response.body, (err, res) => {
           response.result = res.sms_api.status[0];
@@ -66,7 +63,7 @@ class Sms {
     let xml = builder.buildObject(messageBody);
     return (async () => {
       try {
-        const { response } = await soapRequest(config.smsApiUrl, this.headers, xml);
+        const { response } = await soapRequest(process.env.SMS_API_URL, this.headers, xml);
         let parser = new xml2js.Parser();
         parser.parseString(response.body, (err, res) => {
           // parse xml response
@@ -96,7 +93,7 @@ class Sms {
     let xml = builder.buildObject(messageBody);
     return (async () => {
       try {
-        const { response } = await soapRequest(config.smsApiUrl, this.headers, xml);
+        const { response } = await soapRequest(process.env.SMS_API_URL, this.headers, xml);
         let parser = new xml2js.Parser();
         parser.parseString(response.body, (err, res) => {
           // parse xml response
