@@ -47,3 +47,8 @@ server.listen(port, () => {
   console.log('Listening on port ' + port);
 });
 
+
+
+// RESTORE MONGODB to URI DB
+// mongorestore --uri mongodb+srv://<username>:<password>@x.x.mongodb.net/convey_feed convey_feed/ -d convey_feed
+
