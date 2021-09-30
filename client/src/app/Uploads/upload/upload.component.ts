@@ -8,6 +8,7 @@ import {FileItem, FileLikeObject, FileUploader} from 'ng2-file-upload';
 import {WINDOW} from '../../window.service';
 import {MatSnackBar} from '@angular/material';
 import {AuthService} from '../../auth/auth.service';
+import {environment} from "../../../environments/environment";
 
 @Component({
   selector: 'app-upload',
@@ -41,7 +42,7 @@ export class UploadComponent implements OnInit {
     public authService: AuthService,
     @Inject(WINDOW) private window: Window
   ) {
-    this.url = `${window.location.protocol}//${window.location.host}` + '/user/upload';
+    this.url = environment.api_url + '/user/upload';
      // route snapshot in order upload/fileID/reqDocID/contactID
     const fileID = route.snapshot.paramMap.get('file');
     const contactID = route.snapshot.paramMap.get('contact');

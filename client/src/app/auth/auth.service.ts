@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { WINDOW } from '../window.service';
 import { IUser } from '../../interfaces/IUser';
 import {Observable} from 'rxjs';
+import {environment} from "../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,7 @@ export class AuthService {
     private router: Router,
     @Inject(WINDOW) private window: Window
     ) {
-    this.host = `${window.location.protocol}//${window.location.host}` + '/user';
+    this.host = environment.api_url + '/user';
   }
 
   addUser (user) {

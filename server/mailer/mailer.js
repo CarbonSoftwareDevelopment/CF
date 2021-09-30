@@ -14,11 +14,11 @@ class Mailer {
     const options = {
       viewEngine: {
         extname: '.hbs',
-        layoutsDir: 'server/mailer/views/',
+        layoutsDir: 'mailer/views/',
         defaultLayout: 'templates/template',
-        partialsDir: 'server/mailer/views/partials'
+        partialsDir: 'mailer/views/partials'
       },
-      viewPath: 'server/mailer/views/views/',
+      viewPath: 'mailer/views/views/',
       extName: '.hbs'
     };
 
@@ -42,28 +42,31 @@ class Mailer {
   }
 
   send(templateName, context, toEmail, subject) {
+
     let that = this;
-    // Returns promise
-    /*console.log(JSON.stringify(context));
-    console.log('sending email to ' + toEmail);*/
-    return new Promise((resolve, reject) => {
-      this.mailer.sendMail({
-        from: that.emailFrom,
-        to: toEmail,
-        bcc: process.env.BCC_EMAIL,
-        subject: subject,
-        template: templateName,
-        context: context
-      }, (error, response) => {
-        if (error) {
-          reject(error);
-        }
-        /*console.log(toEmail);
-        console.log(response);*/
-        that.mailer.close();
-        resolve(response);
+
+    if (process.env.NODE_ENV !== 'development' || ['renaldovd@gmail.com', 'ronnie@georgetown.co.za'].indexOf(toEmail) > -1) {
+      console.log("SENDING EMAIL TO", toEmail);
+      return new Promise((resolve, reject) => {
+        this.mailer.sendMail({
+          from: that.emailFrom,
+          to: toEmail,
+          bcc: process.env.BCC_EMAIL,
+          subject: subject,
+          template: templateName,
+          context: context
+        }, (error, response) => {
+          if (error) {
+            reject(error);
+          }
+          /*console.log(toEmail);
+          console.log(response);*/
+          that.mailer.close();
+          resolve(response);
+        });
       });
-    });
+    }
+    return new Promise(resolve => resolve());
   }
 
   //Helper function to determine if word starts with a vowel

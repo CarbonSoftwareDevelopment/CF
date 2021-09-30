@@ -5,6 +5,7 @@ import {WINDOW} from '../window.service';
 import {AuthService} from '../auth/auth.service';
 import {Observable} from 'rxjs';
 import { map, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import {environment} from "../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,7 @@ export class AdminService {
     private auth: AuthService,
     @Inject(WINDOW) private window: Window,
   ) {
-    this.host = `${window.location.protocol}//${window.location.host}` + '/user';
+    this.host = environment.api_url + '/user';
   }
 
   createMilestones(milestones, listID) {

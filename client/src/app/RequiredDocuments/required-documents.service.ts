@@ -3,6 +3,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {WINDOW} from '../window.service';
 import {AuthService} from '../auth/auth.service';
+import {environment} from "../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,7 @@ export class RequiredDocumentsService {
     @Inject(WINDOW) private window: Window,
     private auth: AuthService
   ) {
-    this.host = `${window.location.protocol}//${window.location.host}` + '/user';
+    this.host = environment.api_url + '/user';
   }
   createRequiredDocument(rd) {
     const headers = new HttpHeaders();

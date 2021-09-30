@@ -4,6 +4,7 @@ import {Router} from '@angular/router';
 import {WINDOW} from '../window.service';
 import {AuthService} from '../auth/auth.service';
 import {Observable} from 'rxjs/index';
+import {environment} from "../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,7 @@ export class FileService {
     @Inject(WINDOW) private window: Window,
     private auth: AuthService
   ) {
-    this.host = `${window.location.protocol}//${window.location.host}` + '/user';
+    this.host = environment.api_url + '/user';
   }
   createFile(file) {
     const uid = this.auth.getID();

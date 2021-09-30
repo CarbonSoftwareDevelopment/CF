@@ -9,8 +9,6 @@ const express = require('express'),
 
 dotenv.config();
 
-console.log(process.env.NODE_ENV);
-
 mongoose.Promise = global.Promise;
 const mongooseOptions = {
   auto_reconnect: true,
@@ -21,7 +19,7 @@ const mongooseOptions = {
   ha: true, // Make sure the high availability checks are on
   haInterval: 5000, // Run every 5 seconds
 };
-mongoose.connect(process.env.DB, mongooseOptions).then(
+mongoose.connect(process.env.DB_URI, mongooseOptions).then(
   () => {console.log('Database is connected') },
   err => { console.log('Can not connect to the database'+ err)}
 );

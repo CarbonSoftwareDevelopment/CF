@@ -5,6 +5,7 @@ import {WINDOW} from '../window.service';
 import {Router} from '@angular/router';
 import {Observable} from 'rxjs/index';
 import {debounceTime, distinctUntilChanged, switchMap} from 'rxjs/operators';
+import {environment} from "../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,7 @@ export class ContactService {
     private auth: AuthService,
     @Inject(WINDOW) private window: Window,
   ) {
-    this.host = `${window.location.protocol}//${window.location.host}` + '/user';
+    this.host = environment.api_url + '/user';
   }
 
   getContact(id): Observable<any> {
