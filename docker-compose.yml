@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  web:
+    build: .
+    links:
+      - "mongodb:mongodb"
+  mongodb:
+    image : mongo
+    container_name: mongodb
+    volumes:
+      - /Users/renaldo/data/db:/data/db
+    ports:
+      - "27017:27017"
+    restart: unless-stopped
+
