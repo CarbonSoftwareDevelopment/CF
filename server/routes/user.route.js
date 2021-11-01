@@ -13,8 +13,10 @@ const Document = require('../models/document');
 const bcrypt = require('bcrypt');
 const Mailer = require ('../mailer/mailer');
 const Sms = require('../smsModule/sms');
+const Twilio = require("../smsModule/twilio");
 const crypto = require('crypto');
 const smser = new Sms();
+const twilioSms = new Twilio();
 const mailer = new Mailer(process.env.EMAIL_HOST, process.env.EMAIL_PORT, process.env.FROM_EMAIL, process.env.EMAIL_API_KEY, process.env.EMAIL_USERNAME);
 const async = require('async');
 const multer = require('multer');
@@ -32,11 +34,9 @@ const upload = multer({storage: storage}).any();
 const fs = require('fs');
 const path = require('path');
 
-
-
 // ============================ ADMIN ROUTES ===========================
 userRoutes.route('/getSmsCredits').get((req, res, next) => {
-  smser.getCredits()
+  twilioSms.getCredits()
     .then(response => {
       if (response) {
         res.send(response);
@@ -1277,7 +1277,7 @@ userRoutes.route('/completeMilestone').post((req, res, next) => {
                       bank: newFile.bank
                     };
                     if(ct.cell) {
-                      smser.send(
+                      twilioSms.send(
                         ct.cell,
                         buildMessage(smsMessage, smsContext)
                       ).then(res => {}, (error) => {
@@ -1316,7 +1316,7 @@ userRoutes.route('/completeMilestone').post((req, res, next) => {
                 }
                 if (callback.milestone.sendSMS) { // send sms
                   if (ct.cell) {
-                    smser.send(ct.cell, buildMessage(smsMessage, emailContext))
+                    twilioSms.send(ct.cell, buildMessage(smsMessage, emailContext))
                       .then(res => {}, (error) => {
                         console.log(error);
                         res.send(false);
@@ -1409,7 +1409,7 @@ userRoutes.route('/addComment').post((req, res, next) => {
                       bank: result.bank
                     };
                     const url = req.protocol + '://' + req.get('host') + '/login/' + encodeURI(fileID) + '/' + encodeURI(ct._id);
-                    smser.commentMade(ct.cell, comment.comment, user.name, result.propertyDescription, result.milestoneList.milestones[0]._id.name, buildMessage(commentFooter, footerContext));
+                    twilioSms.commentMade(ct.cell, comment.comment, user.name, result.propertyDescription, result.milestoneList.milestones[0]._id.name, buildMessage(commentFooter, footerContext));
                   }
                 });
               }
@@ -1486,7 +1486,7 @@ userRoutes.route('/addSummary').post((req, res, next) => {
                       bank: result.bank
                     };
                     const url = req.protocol + '://' + req.get('host') + '/login/' + encodeURI(fileID) + '/' + encodeURI(ct._id);
-                    smser.summaryAdded(ct.cell, summary.summary, user.name, result.propertyDescription, result.fileRef, buildMessage(commentFooter, footerContext));
+                    twilioSms.summaryAdded(ct.cell, summary.summary, user.name, result.propertyDescription, result.fileRef, buildMessage(commentFooter, footerContext));
                   }
                 });
               }

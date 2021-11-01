@@ -10,3 +10,5 @@ DB_URI=mongodb://localhost/convey_feed
 SMS_API_URL=http://www.fwxgwsa.co.za/smsapi/api.cgi
 SMS_USERNAME=exampleUn
 SMS_PASSWORD=examplePW
+TWILIO_SID=
+TWILIO_AUTH_TOKEN=

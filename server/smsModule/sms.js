@@ -14,6 +14,7 @@ class Sms {
     let xml = builder.buildObject(loginBody);
     return (async () => {
       try {
+        console.log("LOGGIN IN ", process.env.SMS_API_URL, this.headers, xml)
         const { response } = await soapRequest(process.env.SMS_API_URL, this.headers, xml);
         let parser = new xml2js.Parser();
         parser.parseString(response.body, (err, res) => {
