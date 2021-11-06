@@ -20,23 +20,41 @@ import * as FileSaver from 'file-saver';
   styleUrls: ['./file-table.component.css'],
   animations: [
     trigger('detailExpand', [
+      state('collapsed, void', style({ height: '0px'})),
+      state('expanded', style({ height: '*' })),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+      transition('expanded <=> void', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)'))
+    ])
+  ],
+  /*animations: [
+    trigger('detailExpand', [
       state('void', style({ height: '0px', minHeight: '0', visibility: 'hidden' })),
       state('*', style({ height: '*', visibility: 'visible' })),
       transition('void <=> *', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
     ]),
-  ],
+  ],*/
 })
 export class FileTableComponent implements OnInit {
-  displayedColumns: string[] = ['action', 'fileRef', 'secretary', 'created', 'updated', 'actions'];
+  /*displayedColumns: string[] = ['action', 'fileRef', 'secretary', 'created', 'updated', 'actions'];
   dataSource;
   uploads: any[];
   reqDocs: any[];
   files;
   archFiles;
   archived;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
-
+  expandedElement: File | null;
+  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChild(MatSort, {static: true}) sort: MatSort;*/
+  uploads: any[];
+  reqDocs: any[];
+  archFiles;
+  archived;
+  files: File[];
+  dataSource;
+  columnsToDisplay: string[] = ['action', 'fileRef', 'secretary', 'created', 'updated', 'actions'];
+  expandedElement: File | null;
+  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChild(MatSort, { static: true }) sort: MatSort;
   isExpansionDetailRow = (index, row) => row.hasOwnProperty('detailRow');
 
   constructor(
@@ -50,6 +68,7 @@ export class FileTableComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.getRequiredDocs(); // get required document templates
     this.fileService.getMyFiles(false)
       .subscribe(res => {
         this.files = res;
@@ -59,6 +78,7 @@ export class FileTableComponent implements OnInit {
         console.log(err);
       });
   }
+
   initDataSource() {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
@@ -74,28 +94,42 @@ export class FileTableComponent implements OnInit {
     };
     this.dataSource.filterPredicate =
       (data: File, filters: string) => {
+        const searchObject = { // searchable fields
+          fileRef: data.fileRef,
+          propertyDescription: data.propertyDescription,
+          refUser: data.refUser.map(u => u.name)
+        };
         const matchFilter = [];
         const filterArray = filters.split('+');
         // slim down objects to only filterable fields
-        const tempData = JSON.parse(JSON.stringify(data));
-        tempData.contacts.forEach(ct => {
-          delete ct._id;
-          delete ct.passwordHash;
-          delete ct.verified;
-          delete ct.type;
-          delete ct._v;
-        });
-        tempData.milestoneList.milestones.forEach(m => {
-          delete m.completed;
-          delete m.comments;
-          delete m.updatedBy._id;
-          delete m._id;
-        });
+        const tempData = JSON.parse(JSON.stringify(searchObject));
+        /*if (tempData.contacts) {
+          tempData.contacts.forEach(ct => {
+            delete ct._id;
+            delete ct.passwordHash;
+            delete ct.verified;
+            delete ct.type;
+            delete ct._v;
+          });
+        }
+        if (tempData.milestoneList.milestones) {
+          tempData.milestoneList.milestones.forEach(m => {
+            delete m.completed;
+            delete m.comments;
+            if (!m.updatedBy) {
+              delete m.updatedBy;
+            } else {
+              delete m.updatedBy._id;
+            }
+            delete m._id;
+          });
+        }
+
         tempData.milestoneList._id = tempData.milestoneList._id.title;
         delete tempData._id;
-        delete tempData.updatedBy._id;
-        delete tempData.createdBy._id;
-        delete tempData._v;
+        delete tempData.updatedBy;
+        delete tempData.createdBy;
+        delete tempData._v;*/
         const columns = (<any>Object).values(this.flatten(tempData));
         // console.log(tempData);
         // OR be more specific [data.name, data.race, data.color];
@@ -260,7 +294,7 @@ export class FileTableComponent implements OnInit {
   archiveFile(file) {
     if (!file.archived) {
       if (confirm('Are you sure you want to archive this file?')) {
-        this.fileService.updateFile({_id: file._id, archived: !file.archived})
+        this.fileService.updateFile({_id: file._id, archived: !file.archived, archivedAt: new Date()})
           .subscribe(res => {
             if (res) {
               const i = this.files.findIndex(f => f._id === res._id);
@@ -279,7 +313,7 @@ export class FileTableComponent implements OnInit {
       }
     } else {
       if (confirm('Are you sure you want to restore this file?')) {
-        this.fileService.updateFile({_id: file._id, archived: !file.archived})
+        this.fileService.updateFile({_id: file._id, archived: !file.archived, archivedAt: null})
           .subscribe(res => {
             if (res) {
               const i = this.archFiles.findIndex(f => f._id === res._id);
@@ -326,6 +360,7 @@ export class FileTableComponent implements OnInit {
     dialConfig.autoFocus = true;
     dialConfig.minWidth = 200;
     dialConfig.data = ct;
+    dialConfig.data.existing = true;
     const dialogRef = this.dialog.open(AddContactDialogComponent, dialConfig);
     dialogRef.afterClosed().subscribe(res => {
       if (res) {
@@ -352,7 +387,7 @@ export class FileTableComponent implements OnInit {
       }
     });
   }
-  getUploads() {
+  /*getUploads() {
     if (!this.uploads) {
       this.uploadService.getAllUploadsFile()
         .subscribe(res => {
@@ -400,6 +435,19 @@ export class FileTableComponent implements OnInit {
       thisFile.requiredDocuments = newReqDocs.filter(rd => rd.uploads.length > 0);
       this.files = this.files.map(f => f._id === fid ? thisFile : f);
     }
+  }*/
+  getThisFileReqDocs(file) {
+    let reqDocs = JSON.parse(JSON.stringify(this.reqDocs)).filter(rd => file.uploads.map(u => u.requiredDocumentID).indexOf(rd._id));
+    // reqDocs = reqDocs.filter(rd => file.uploads.map(u => u.requiredDocumentID).indexOf(rd._id));
+    reqDocs.forEach(rd => {
+      rd.uploads = [];
+      file.uploads.forEach(u => {
+        if (rd._id === u.requiredDocumentID._id) {
+          rd.uploads.push(u);
+        }
+      });
+    });
+    return reqDocs.filter(rd => rd.uploads.length > 0); // only return reqdocs with 1 or more uploads
   }
   getRequiredDocs() {
     if (!this.reqDocs) {
@@ -407,6 +455,31 @@ export class FileTableComponent implements OnInit {
         .subscribe(res => {
           if (res) {
             this.reqDocs = res;
+          }
+        }, err => {
+          if (err) {
+            console.log(err);
+          }
+        });
+    }
+  }
+  getFile(row) {
+    if (row === this.expandedElement) {
+      this.fileService.getFileForAdmin(row._id)
+        .subscribe(file => {
+          if (file) {
+            let resFile = JSON.parse(JSON.stringify(file));
+            resFile.requiredDocuments = this.getThisFileReqDocs(resFile); // sort uploads into their req docs
+            const rowIndex = this.dataSource.data.indexOf(row);
+            if (this.archived) {
+              this.archFiles = this.archFiles.map(f => f._id === resFile._id ? resFile : f);
+              this.dataSource.data = this.archFiles;
+            } else {
+              this.files = this.files.map(f => f._id === resFile._id ? resFile : f);
+              this.dataSource.data = this.files;
+            }
+            this.expandedElement = this.dataSource.data[rowIndex];
+            this.initDataSource();
           }
         }, err => {
           if (err) {
@@ -426,25 +499,27 @@ export class FileTableComponent implements OnInit {
     this.uploadService.download(d.name)
       .subscribe(res => FileSaver.saveAs(res, d.name), er => console.log(er));
   }
-
 }
 
 export interface File {
   _id: string;
   fileRef: string;
   action: string;
-  userRef: string;
-  milestoneList: MilestoneList;
-  contacts: [any];
+  refUser: [any];
+  uploads?: [any];
+  milestoneList?: MilestoneList;
+  contacts?: [any];
   propertyDescription: string;
   updatedBy: any;
   createdBy: any;
   updatedAt: any;
   createdAt: any;
   archived: boolean;
-  entity: any;
+  archivedAt: Date;
+  entity?: any;
   _v: any;
-  requiredDocuments: any;
+  requiredDocuments?: any;
+  fullFile?: boolean;
 }
 export interface MilestoneList {
   _id: any;
@@ -466,5 +541,3 @@ export interface Milestone {
   }];
   completed: boolean;
 }
-
-

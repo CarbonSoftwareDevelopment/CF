@@ -1,3 +1,6 @@
+let request = require('request');
+let http = require('http');
+const config = require('../../config/config');
 const xml2js = require('xml2js');
 const soapRequest = require('easy-soap-request');
 
@@ -9,13 +12,12 @@ class Sms {
     };
   }
   login() {
-    let loginBody = {api_action: 'login', api_username: process.env.SMS_USERNAME, api_password: process.env.SMS_PASSWORD};
+    let loginBody = {api_action: 'login', api_username: config.smsApiUsername, api_password: config.smsApiPassword};
     let builder = new xml2js.Builder({rootName: 'sms_api'});
     let xml = builder.buildObject(loginBody);
     return (async () => {
       try {
-        console.log("LOGGIN IN ", process.env.SMS_API_URL, this.headers, xml)
-        const { response } = await soapRequest(process.env.SMS_API_URL, this.headers, xml);
+        const { response } = await soapRequest(config.smsApiUrl, this.headers, xml, 10000);
         let parser = new xml2js.Parser();
         parser.parseString(response.body, (err, res) => {
           // parse xml response
@@ -40,7 +42,7 @@ class Sms {
     let xml = builder.buildObject(loginBody);
     return (async () => {
       try {
-        const { response } = await soapRequest(process.env.SMS_API_URL, this.headers, xml);
+        const { response } = await soapRequest(config.smsApiUrl, this.headers, xml, 10000);
         let parser = new xml2js.Parser();
         parser.parseString(response.body, (err, res) => {
           response.result = res.sms_api.status[0];
@@ -52,6 +54,7 @@ class Sms {
     })()
   }
   sendMessage(sessionid, message, contact) {
+    message = this.escapeSpecialChars(message);
     let messageBody = {
       api_action: 'sendmessages', api_sessionid: sessionid, action_content: {
         sms : {
@@ -64,7 +67,7 @@ class Sms {
     let xml = builder.buildObject(messageBody);
     return (async () => {
       try {
-        const { response } = await soapRequest(process.env.SMS_API_URL, this.headers, xml);
+        const { response } = await soapRequest(config.smsApiUrl, this.headers, xml, 10000);
         let parser = new xml2js.Parser();
         parser.parseString(response.body, (err, res) => {
           // parse xml response
@@ -94,7 +97,7 @@ class Sms {
     let xml = builder.buildObject(messageBody);
     return (async () => {
       try {
-        const { response } = await soapRequest(process.env.SMS_API_URL, this.headers, xml);
+        const { response } = await soapRequest(config.smsApiUrl, this.headers, xml, 10000);
         let parser = new xml2js.Parser();
         parser.parseString(response.body, (err, res) => {
           // parse xml response
@@ -128,36 +131,10 @@ class Sms {
       return promise;
     } catch (e) {
       if (e) {
+        console.log(message);
         throw e;
       }
     }
-    /*const ct = this.parseContact(contact);
-    const msg = encodeURIComponent(encodeURI(message));
-    const smsApiUrl = 'http://148.251.196.36/app/smsapi/index.php?key=' + config.smsAPIKey + '&type=text&contacts='+ ct +'&senderid=ULTIMATE&msg=' + msg;
-    let promise = new Promise(function(resolve, reject) {
-      if (message.length >= 740) {
-        reject(new Error('Message is too long'));
-      } else {
-        http.get(smsApiUrl, (resp) => {
-
-          let data = '';
-
-          // A chunk of data has been recieved.
-          resp.on('data', (chunk) => {
-            data += chunk;
-          });
-
-          // The whole response has been received. Print out the result.
-          resp.on('end', () => {
-            resolve(data);
-          });
-
-        }).on("error", (err) => {
-          reject("Error: " + err.message);
-        });
-      }
-    });
-    return promise;*/
   }
   parseContact(ct) {
     if (ct[0] === '0' && ct.length === 10) {
@@ -169,7 +146,7 @@ class Sms {
     return ct;
   }
   commentMade(contact, comment, adminName, propDesc, milestone, footer) {
-    const preMessage = adminName + ' added a comment: ' + propDesc + '. ' + milestone + '. ';
+    /*const preMessage = adminName + ' added a comment: ' + propDesc + '. ' + milestone + '. ';
     let lengthPreComment = preMessage.length + footer.length + 2; // get length of sms body without comment
     let totalLength = comment.length + lengthPreComment;
     if ( totalLength > 740 ) {
@@ -178,8 +155,8 @@ class Sms {
       // console.log('overflow: ' + overflow);
       let cutIndice = comment.length - overflow;
       comment = comment.substring(0, cutIndice);
-    }
-    const message = adminName + ' added a comment: ' + propDesc + '. ' + milestone + '. ' + comment + '. ' + footer;
+    }*/
+    let message = adminName + ' added a comment: ' + propDesc + '. ' + milestone + '. ' + comment + '. ' + footer;
     // console.log('final total length: ' + message.length);
     return this.send(contact, message)
       .then(res => {}).catch(err => {
@@ -187,7 +164,7 @@ class Sms {
       });
   }
   summaryAdded(contact, summary, adminName, propDesc, fileRef, footer) {
-    const preMessage = adminName + ' added a summary progress report: ' + propDesc + '. ' + fileRef + '. ';
+    /*const preMessage = adminName + ' added a summary progress report: ' + propDesc + '. ' + fileRef + '. ';
     let lengthPreComment = preMessage.length + footer.length + 2; // get length of sms body without comment
     let totalLength = summary.length + lengthPreComment;
     if ( totalLength > 740 ) {
@@ -196,8 +173,8 @@ class Sms {
       // console.log('overflow: ' + overflow);
       let cutIndice = summary.length - overflow;
       summary = summary.substring(0, cutIndice);
-    }
-    const message = adminName + ' added a summary progress report: ' + propDesc + '. ' + fileRef + '. ' + summary + '. ' + footer;
+    }*/
+    let message = adminName + ' added a summary progress report: ' + propDesc + '. ' + fileRef + '. ' + summary + '. ' + footer;
     // console.log('final total length: ' + message.length);
     return this.send(contact, message)
       .then(res => {
@@ -245,6 +222,13 @@ class Sms {
       });
     });
     return promise;*/
+  }
+  escapeSpecialChars(message) {
+    message = message.replace(/[\\\[\]^<>]/g, " "); // replace all illegal characters with a space.
+    message = message.replace('’', "'");
+    message = message.replace('–', '-');
+    message = message.replace('½', 'half');
+    return message;
   }
 }
 

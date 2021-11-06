@@ -642,6 +642,9 @@ userRoutes.route('/addOneDeedsOffice').post((req, res, next) => {
 // ============================ CONTACTS ROUTES  =======================
 userRoutes.route('/addContact').post((req, res, next) => {
   let contact = req.body.contact;
+  let birthday = new Date(contact.dob);
+  contact.birthmonth = birthday.getMonth() + 1;
+  contact.birthday = birthday.getDate();
   if (contact.email === "" || contact.email === null) {
     delete contact.email;
   } else {
@@ -731,6 +734,9 @@ userRoutes.route('/deleteContact').post((req, res, next) => {
 });
 userRoutes.route('/updateContact').post((req, res, next) => {
   const ct = req.body;
+  let birthday = new Date(ct.dob);
+  ct.birthmonth = birthday.getMonth() + 1;
+  ct.birthday = birthday.getDate();
   if (ct.email === "" || ct.email === null) {
     delete ct.email;
   } else {
@@ -950,6 +956,31 @@ userRoutes.route('/updateForgotPasswordContact').post((req, res, next) => {
     }
   });
 });
+userRoutes.route('/happyBirthdayContacts').get((req, res, next) => {
+  const now = new Date();
+  const day = now.getDate();
+  const month = now.getMonth() + 1; // numbered 0-11
+
+  Contact.find({ "birthday": day, "birthmonth": month, "cell": {$ne : null} }, (err, contacts) => {
+    if (err) {
+      next(err);
+    } else {
+      async.each(contacts, (ct, callback) => {
+        const message = `Dear ${ct.title} ${ct.surname} when it comes to your birthday, we just want to share our good wishes and cheer. Have a wonderful birthday and an even better year! Regards, the CBI Attorney Team.`;
+        smser.send(ct.cell, message).then((status) => {
+          callback();
+        }).catch((e) => {
+          callback(e);
+        });
+      }, (e) => {
+        if(e) next(e);
+        else {
+          res.json(contacts);
+        }
+      });
+    }
+  });
+});
 // ============================ CONTACTS ROUTES  =======================
 // ============================ FILE ROUTES  ===========================
 userRoutes.route('/addFile').post((req, res, next) => {
@@ -1098,9 +1129,34 @@ userRoutes.route('/updateFile').post((req, res, next) => {
   })
 });
 userRoutes.route('/files/:archived').get((req, res, next) => {
-  // get all Files
+  // get all Files that are not archived
   const arch = req.params.archived;
-  File.find({archived: arch})
+  // show only cause of act | FileRef | SecNames | created at by | updated at by | prop details
+  File.find({archived: arch}, {
+    fileRef: 1,
+    refUser: 1,
+    "milestoneList.id" : 1,
+    createdAt: 1,
+    createdBy: 1,
+    propertyDescription: 1,
+    updatedAt: 1,
+    archived: 1
+  })
+  .populate('milestoneList._id', 'title')
+  .populate('refUser', 'name')
+  .populate('createdBy', 'name')
+  .populate('updatedBy', 'name')
+  .sort({createdAt: -1})
+  .exec((er, files) => {
+    if (er) {
+      return next(er);
+    } else if (files) {
+      res.send(files);
+    } else {
+      res.send(false);
+    }
+  });
+  /* File.find({archived: arch})
     .populate('milestoneList.milestones._id')
     .populate('milestoneList._id', 'title')
     .populate('milestoneList.milestones.updatedBy', 'name')
@@ -1137,7 +1193,7 @@ userRoutes.route('/files/:archived').get((req, res, next) => {
       } else {
         res.send(false);
       }
-    });
+    }); */
 });
 userRoutes.route('/file/:id').get((req, res, next) => {
   const id = req.params.id;
@@ -1167,6 +1223,101 @@ userRoutes.route('/file/:id').get((req, res, next) => {
         return a._id.number - b._id.number;
       });
       res.send(file);
+    }
+  });
+});
+userRoutes.route('/adminFile/:id').get((req, res, next) => {
+  // get one file and it's uploads to display on admin home
+  const id = req.params.id;
+  async.parallel({
+    file: (callback) => {
+      File.findById(id)
+        .populate('milestoneList.milestones._id')
+        .populate('milestoneList._id', 'title')
+        .populate('milestoneList.milestones.updatedBy', 'name')
+        .populate('contacts', 'name surname title email cell type dob')
+        .populate('milestoneList.milestones.comments.user', 'name')
+        .populate('summaries.user', 'name')
+        .populate('createdBy', 'name')
+        .populate('updatedBy', 'name')
+        .populate('refUser', 'name')
+        .populate({ // to display entity on file
+          path: 'entity',
+          populate: {
+            path: 'contacts'
+          }
+        })
+        .populate({ // to have file info when editing entity
+          path: 'entity',
+          populate: {
+            path: 'files',
+            select: 'fileRef'
+          }
+        })
+        .exec((er, file) => {
+          if (er) {
+            callback(er);
+          } else if (file) {
+            file.milestoneList.milestones.sort((a, b) => {
+              return a._id.number - b._id.number;
+            });
+            callback(null, file);
+          } else {
+            callback(null, file)
+          }
+        });
+    },
+    uploads: (callback) => {
+      Document.find({fileID: id})
+        .populate({
+          path: 'milestoneID',
+          select: 'name'
+        })
+        .populate({
+          path: 'requiredDocumentID',
+          select: 'name',
+          populate: {
+            path: 'milestone',
+            select: 'name'
+          }
+        })
+        .populate({
+          path: 'contactID',
+          select: 'name'
+        })
+        .exec((err, uploads) => {
+          if(err) callback(err);
+          else if(uploads.length > 0) {
+            async.each(uploads, (u, cb) => {
+              let fullPath = __dirname + '/../../' + u.path;
+              fs.readFile(fullPath, (er, data) => {
+                if(er) cb(er);
+                else {
+                  if (u.mimeType.split('/')[0] === 'image') {
+                    u.path =  new Buffer(data).toString('base64');
+                  }
+                  cb();
+                }
+              });
+            }, (er) => {
+              if (er) callback(er);
+              else {
+                callback(null, uploads);
+              }
+            });
+          } else {
+            callback(null, uploads);
+          }
+        })
+    }
+  }, (er, callback) => {
+    if(er) next(er);
+    else if(callback.file) {
+      let resFile = JSON.parse(JSON.stringify(callback.file));
+      resFile.uploads = callback.uploads;
+      res.send(resFile);
+    } else {
+      res.send(false);
     }
   });
 });
@@ -1282,7 +1433,6 @@ userRoutes.route('/completeMilestone').post((req, res, next) => {
                         buildMessage(smsMessage, smsContext)
                       ).then(res => {}, (error) => {
                         console.log(error);
-                        res.send(false);
                       });
                     }
                   });
@@ -1319,7 +1469,7 @@ userRoutes.route('/completeMilestone').post((req, res, next) => {
                     twilioSms.send(ct.cell, buildMessage(smsMessage, emailContext))
                       .then(res => {}, (error) => {
                         console.log(error);
-                        res.send(false);
+
                       });
                   }
                 }

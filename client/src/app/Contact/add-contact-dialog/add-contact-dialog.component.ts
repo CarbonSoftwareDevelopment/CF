@@ -1,18 +1,23 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, Validators} from '@angular/forms';
-import {MAT_DIALOG_DATA, MatDialogRef, MatSnackBar} from '@angular/material';
+import {DateAdapter, MAT_DATE_FORMATS, MAT_DIALOG_DATA, MatDialogRef, MatSnackBar} from '@angular/material';
 import {LoaderService} from '../../Common/Loader/index';
 import {AdminService} from '../../Admin/admin.service';
 import {GlobalValidators} from '../../Common/Validators/globalValidators';
 import {ContactService} from '../contact.service';
+import {APP_DATE_FORMATS, AppDateAdapter} from "./format-datepicker";
 
 @Component({
   selector: 'app-add-contact-dialog',
   templateUrl: './add-contact-dialog.component.html',
-  styleUrls: ['./add-contact-dialog.component.css']
+  styleUrls: ['./add-contact-dialog.component.css'],
+  providers: [
+    {provide: DateAdapter, useClass: AppDateAdapter},
+    {provide: MAT_DATE_FORMATS, useValue: APP_DATE_FORMATS}
+  ]
 })
 export class AddContactDialogComponent implements OnInit {
-
+  maxDate = new Date();
   contactForm: FormGroup;
   existing = false;
 
@@ -27,12 +32,13 @@ export class AddContactDialogComponent implements OnInit {
   ) {
     this.createContactsForm();
     if (data) {
-      if (data.email) {
+      console.log(data);
+      if (data.existing) {
         this.existing = true;
         this.contactForm.patchValue(data);
         this.email.clearAsyncValidators();
         this.email.updateValueAndValidity();
-      } else if (data.name) {
+      } else if (data.new) {
         this.contactForm.patchValue(data);
       }
     }
@@ -50,6 +56,7 @@ export class AddContactDialogComponent implements OnInit {
       title: ['', Validators.required],
       name: ['', Validators.required],
       surname: ['', Validators.required],
+      dob: ['', Validators.required],
       cell: ['', [GlobalValidators.cellRegex]],
       email: ['', [GlobalValidators.validEmail]],
       type: ['', Validators.required]
@@ -63,6 +70,9 @@ export class AddContactDialogComponent implements OnInit {
   }
   get surname() {
     return this.contactForm.get('surname');
+  }
+  get dob() {
+    return this.contactForm.get('dob');
   }
   get cell() {
     return this.contactForm.get('cell');

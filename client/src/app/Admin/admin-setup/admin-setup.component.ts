@@ -11,7 +11,6 @@ import {
 import {AdminService} from '../admin.service';
 import {LoaderService} from '../../Common/Loader';
 import {AuthService} from '../../auth/auth.service';
-import {computeStyle} from '@angular/animations/browser/src/util';
 import {
   ErrorStateMatcher,
   MatAutocomplete,
@@ -604,7 +603,12 @@ export class AdminSetupComponent implements OnInit {
     dialConfig.autoFocus = true;
     if (ct) {
       dialConfig.data = ct;
+      dialConfig.data.existing = true;
       index = this.allContacts.indexOf(ct);
+    } else {
+      dialConfig.data = {
+        new: true
+      };
     }
     const dialogRef = this.dialog.open(AddContactDialogComponent, dialConfig);
     dialogRef.afterClosed().subscribe(res => {

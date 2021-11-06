@@ -50,18 +50,18 @@ export class AddFileComponent implements OnInit {
   allSecretaries: any[] = [];
   secretaries: any[] = [];
   matcher = new ErrorStateMatcher();
-  @ViewChild('secInput') secretaryInput: ElementRef<HTMLInputElement>;
-  @ViewChild('auto') secretaryAutoComp: MatAutocomplete;
-  @ViewChild('secTrigger') secInput: MatAutocompleteTrigger;
+  @ViewChild('secInput', {static: true}) secretaryInput: ElementRef<HTMLInputElement>;
+  @ViewChild('auto', {static: true}) secretaryAutoComp: MatAutocomplete;
+  @ViewChild('secTrigger', {static: true}) secInput: MatAutocompleteTrigger;
   // Entity chips autocomplete
   entity = new FormControl('');
   entityChips = new FormControl('');
   filteredEntities: Observable<any[]>;
   allEntities: any[] = [];
   selectedEntity: any[] = [];
-  @ViewChild('entityInput') entityInput: ElementRef<HTMLInputElement>;
-  @ViewChild('autoEntities') autoEntities: MatAutocomplete;
-  @ViewChild('enTrigger') enInputTrigger: MatAutocompleteTrigger;
+  @ViewChild('entityInput', {static: true}) entityInput: ElementRef<HTMLInputElement>;
+  @ViewChild('autoEntities', {static: true}) autoEntities: MatAutocomplete;
+  @ViewChild('enTrigger', {static: true}) enInputTrigger: MatAutocompleteTrigger;
   constructor(
     private fb: FormBuilder,
     private auth: AuthService,
@@ -382,6 +382,7 @@ export class AddFileComponent implements OnInit {
     const dialConfig = new MatDialogConfig();
     dialConfig.disableClose = true;
     dialConfig.autoFocus = true;
+    dialConfig.data = {new: true};
     const dialogRef = this.dialog.open(AddContactDialogComponent, dialConfig);
     dialogRef.afterClosed().subscribe(res => {
       if (res) {
@@ -515,6 +516,7 @@ export class AddFileComponent implements OnInit {
         this.entityChips.setValue(this.selectedEntity);
       }
     }
+    this.addEntity(event.option.value);
   }
   createNewEntityDialog(en?) {
     const dialConfig = new MatDialogConfig();
@@ -535,6 +537,8 @@ export class AddFileComponent implements OnInit {
       }
     });
   }
+
+  // Update file
   removeEntity(en): void {
     const index = this.selectedEntity.indexOf(en);
     if (this.file) {
@@ -555,5 +559,17 @@ export class AddFileComponent implements OnInit {
       }
     }
   }
-  // TODO: Update file, patch entity properly.
+  addEntity(enID): void {
+    if (this.file) {
+      this.entityService.addFileToEntity(enID, this.file._id)
+        .subscribe(res => {
+          if (res) {
+            this.matSnack.open('Entity added successfully');
+          }
+        }, err => {
+          this.matSnack.open('Server error, entity not added');
+          console.log(err);
+        });
+    }
+  }
 }
