@@ -12,10 +12,8 @@ const RequiredDocument = require('../models/reqDocuments');
 const Document = require('../models/document');
 const bcrypt = require('bcrypt');
 const Mailer = require ('../mailer/mailer');
-const Sms = require('../smsModule/sms');
 const Twilio = require("../smsModule/twilio");
 const crypto = require('crypto');
-const smser = new Sms();
 const twilioSms = new Twilio();
 const mailer = new Mailer(process.env.EMAIL_HOST, process.env.EMAIL_PORT, process.env.FROM_EMAIL, process.env.EMAIL_API_KEY, process.env.EMAIL_USERNAME);
 const async = require('async');
@@ -967,7 +965,7 @@ userRoutes.route('/happyBirthdayContacts').get((req, res, next) => {
     } else {
       async.each(contacts, (ct, callback) => {
         const message = `Dear ${ct.title} ${ct.surname} when it comes to your birthday, we just want to share our good wishes and cheer. Have a wonderful birthday and an even better year! Regards, the CBI Attorney Team.`;
-        smser.send(ct.cell, message).then((status) => {
+        twilioSms.send(ct.cell, message).then((status) => {
           callback();
         }).catch((e) => {
           callback(e);

@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  api_url: "http://localhost:4000"
+  api_url: 'http://localhost:4000'
   // api_url: 'https://conveyfeed.h4ehu5vjkp7ba.ap-south-1.cs.amazonlightsail.com'
 };
 

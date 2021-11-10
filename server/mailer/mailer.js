@@ -11,6 +11,7 @@ const timeAgo = new TimeAgo('en-US');
 class Mailer {
 
   constructor(host, port, emailFrom, password, username) {
+    console.log(`MAILER CREATED WTH host: ${host} port: ${port} emailFrom: ${emailFrom} password: ${password} username: ${username}`);
     const options = {
       viewEngine: {
         extname: '.hbs',
@@ -59,8 +60,8 @@ class Mailer {
           if (error) {
             reject(error);
           }
-          /*console.log(toEmail);
-          console.log(response);*/
+          console.log(toEmail);
+          console.log(response);
           that.mailer.close();
           resolve(response);
         });
