@@ -1,22 +1,14 @@
 const cron = require('node-cron');
-const express = require('express');
-const app = express();
-const userRoutes = express.Router();
 const User = require('../models/user');
-const List = require('../models/milestoneList');
-const Milestone = require('../models/milestone');
-const Properties = require('../models/properties');
 const Contact = require('../models/contact');
 const File = require('../models/file');
 const Entity = require('../models/entity');
 const Mailer = require ('../mailer/mailer');
-const Sms = require('../smsModule/sms');
 const async = require('async');
 const mailer = new Mailer(process.env.EMAIL_HOST, process.env.EMAIL_PORT, process.env.FROM_EMAIL, process.env.EMAIL_API_KEY, process.env.EMAIL_USERNAME);
 const TimeAgo = require('javascript-time-ago');
 const en = require('javascript-time-ago/locale/en');
 TimeAgo.addLocale(en);
-const timeAgo = new TimeAgo('en-US');
 
 
 // TODO: When contact gets deleted it saves null in array of top level admin.
