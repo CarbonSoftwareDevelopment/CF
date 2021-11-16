@@ -5,6 +5,7 @@ const express = require('express'),
   mongoose = require('mongoose'),
   http = require('http'),
   Scheduler = require ('./cron/scheduler'),
+  fallback = require('express-history-api-fallback'),
   dotenv = require('dotenv');
 
 dotenv.config();
@@ -43,6 +44,7 @@ mongoose.connect(process.env.DB_URI, mongooseOptions).then(
   err => { console.log('Can not connect to the database'+ err)}
 );
 const userRoutes = require('./routes/user.route');
+const root = __dirname + '/../client/dist';
 const app = express();
 // new Scheduler(process.env.HOST);
 app.use(bodyParser.json());
@@ -60,6 +62,8 @@ app.use((err, req, res, next) => {
   });
 });
 app.use('/user', userRoutes);
+app.use(express.static(root));
+app.use(fallback('/../client/dist/index.html', { root : __dirname}));
 app.all('*', (req, res, next) => {
 
   const err = new Error(`Can't find ${req.originalUrl} on this server!`);
