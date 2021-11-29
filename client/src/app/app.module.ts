@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
@@ -138,8 +139,8 @@ import {FileUploadModule} from 'ng2-file-upload';
     FileService,
     WINDOW_PROVIDERS,
     {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue:  {duration: 4000}},
-    {provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue:  {maxWidth: '400px', minWidth: '60vw'}}
-
+    {provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue:  {maxWidth: '400px', minWidth: '60vw'}},
+    {provide: LocationStrategy, useClass: HashLocationStrategy}
   ],
   bootstrap: [AppComponent],
   entryComponents: [

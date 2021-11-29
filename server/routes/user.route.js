@@ -33,6 +33,9 @@ const fs = require('fs');
 const path = require('path');
 
 // ============================ ADMIN ROUTES ===========================
+userRoutes.route('/test').get((req, res, next) => {
+  res.send("API WORKS.");
+});
 userRoutes.route('/getSmsCredits').get((req, res, next) => {
   twilioSms.getCredits()
     .then(response => {

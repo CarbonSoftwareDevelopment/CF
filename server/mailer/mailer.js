@@ -12,6 +12,7 @@ class Mailer {
 
   constructor(host, port, emailFrom, password, username) {
     console.log(`MAILER CREATED WTH host: ${host} port: ${port} emailFrom: ${emailFrom} password: ${password} username: ${username}`);
+    console.log(typeof host, typeof port, typeof username);
     const options = {
       viewEngine: {
         extname: '.hbs',
@@ -25,18 +26,26 @@ class Mailer {
 
     this.emailFrom = emailFrom;
     this.mailer = nodemailer.createTransport(smtpttransport({
-      host: host,
+      host: 'smtp.sendgrid.net',
       pool: true,
       maxMessages: 50,
       maxConnections: 20,
       secureConnection: true,
-      port: port,
+      port: 465,
       auth: {
-        user: username,
+        user: 'apikey',
         pass: password
       },
       tls: { rejectUnauthorized: false }
     }));
+    // verify connection configuration
+    this.mailer.verify(function (error, success) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log("Server is ready to take our messages");
+      }
+    });
 
     this.mailer.use('compile', hbs(options));
     this.mailer.use('compile', inlineBase64(options))
@@ -48,6 +57,7 @@ class Mailer {
 
     if (process.env.NODE_ENV !== 'development' || ['renaldovd@gmail.com', 'ronnie@georgetown.co.za'].indexOf(toEmail) > -1) {
       console.log("SENDING EMAIL TO", toEmail);
+      console.log("SENDING EMAIL FROM ", that.emailFrom);
       return new Promise((resolve, reject) => {
         this.mailer.sendMail({
           from: that.emailFrom,

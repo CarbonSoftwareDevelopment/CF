@@ -1,15 +1,24 @@
 version: "3.8"
 services:
-  web:
-    build: .
-    links:
-      - "mongodb:mongodb"
-  mongodb:
-    image : mongo
-    container_name: mongodb
+  api:
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: ./server
     volumes:
-      - /Users/renaldo/data/db:/data/db
+      - /app/node_modules
+    env_file: ./server/.env
+  client:
+    build:
+      dockerfile: Dockerfile
+      context: ./client
+    volumes:
+      - /app/node_modules
+  nginx:
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: ./nginx
     ports:
-      - "27017:27017"
-    restart: unless-stopped
+      - '80:80'
 

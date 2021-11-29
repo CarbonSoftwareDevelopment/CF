@@ -44,7 +44,6 @@ mongoose.connect(process.env.DB_URI, mongooseOptions).then(
   err => { console.log('Can not connect to the database'+ err)}
 );
 const userRoutes = require('./routes/user.route');
-const root = __dirname + '/../client/dist';
 const app = express();
 // new Scheduler(process.env.HOST);
 app.use(bodyParser.json());
@@ -62,8 +61,6 @@ app.use((err, req, res, next) => {
   });
 });
 app.use('/user', userRoutes);
-app.use(express.static(root));
-app.use(fallback('/../client/dist/index.html', { root : __dirname}));
 app.all('*', (req, res, next) => {
 
   const err = new Error(`Can't find ${req.originalUrl} on this server!`);
@@ -84,4 +81,5 @@ server.listen(port, () => {
 // mongorestore --uri mongodb+srv://<username>:<password>@x.x.mongodb.net/convey_feed convey_feed/ -d convey_feed
 // docker exec -i mongodb /usr/bin/mongorestore --username username --password admin --authenticationDatabase admin --db convey_feed /dump/convey_feed
 // DEV DB username = username password = admin
+// // aws lightsail push-container-image --region ap-south-1 --service-name conveyfeed --label api --image convey-feed-api:latest
 
