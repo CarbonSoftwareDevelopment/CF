@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"convey_feed.files"},{"v":2,"key":{"createdAt":-1},"name":"createdAt_-1","ns":"convey_feed.files","background":true}],"uuid":"64509fe5d7334801a1512aab1d9ea4ac"}

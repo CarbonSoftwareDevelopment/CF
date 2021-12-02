@@ -64,7 +64,7 @@ userRoutes.route('/addUser').post((req, res, next) => {
         } else {
           if (result) {
             if (!result.company) { // not top level admin, send registration email
-              const host = req.protocol + '://' + req.get('host');
+              const host = process.env.HOST;
               const loginUrl = host + '/admin-login/' + encodeURI(result._id);
               mailer.userCreated(result.name, result.email, loginUrl);
             }
@@ -244,7 +244,7 @@ userRoutes.route('/checkEmailUser').post((req ,res, next) => {
               }
               else {
                 // sendmail with link
-                const link = req.protocol + '://' + req.get('host') + '/admin-reset/' + token;
+                const link = process.env.HOST + '/admin-reset/' + token;
                 mailer.forgotPassword(usr.name, link, usr.email)
                   .then(result => {
                     res.send(true);
@@ -899,7 +899,7 @@ userRoutes.route('/checkEmailContact').post((req ,res, next) => {
                 }
                 else {
                   // sendmail with link
-                  const link = req.protocol + '://' + req.get('host') + '/contact-reset/' + token;
+                  const link = process.env.HOST + '/contact-reset/' + token;
                   mailer.forgotPassword(usr.title + ' ' + usr.surname, link, usr.email)
                     .then(result => {
                       res.send(true);
@@ -1072,7 +1072,7 @@ userRoutes.route('/addFile').post((req, res, next) => {
         .exec((error, f) => {
         if(error) callback(error);
         else {
-          const host = req.protocol + '://' + req.get('host');
+          const host = process.env.HOST;
           if(f.entity) {
             const loginUrl = host + '/entity-login/' + encodeURI(f.entity._id);
             f.entity.contacts.forEach(ct => {
@@ -1387,10 +1387,10 @@ userRoutes.route('/completeMilestone').post((req, res, next) => {
                     if (callback.requiredDocuments.length > 0) { // build required document upload links for buttons in email
                       requiredDocuments = [];
                       callback.requiredDocuments.forEach(rd => {
-                        requiredDocuments.push({name: rd.name, link: req.protocol + '://' + req.get('host') + '/upload/' + encodeURI(fileID) + '/' + encodeURI(rd._id) + '/' + encodeURI(ct._id)});
+                        requiredDocuments.push({name: rd.name, link: process.env.HOST + '/upload/' + encodeURI(fileID) + '/' + encodeURI(rd._id) + '/' + encodeURI(ct._id)});
                       });
                     }
-                    const url = req.protocol + '://' + req.get('host') + '/login/' + encodeURI(fileID) + '/' + encodeURI(ct._id);
+                    const url = process.env.HOST + '/login/' + encodeURI(fileID) + '/' + encodeURI(ct._id);
                     const email = ct.email;
                     // All fields that must replace placeholders in messages
                     const emailContext = {
@@ -1441,7 +1441,7 @@ userRoutes.route('/completeMilestone').post((req, res, next) => {
               }
             } else { // user didn't choose notification preference on front end, use default
               callback.contacts.forEach(ct => {
-                const url = req.protocol + '://' + req.get('host') + '/login/' + encodeURI(fileID) + '/' + encodeURI(ct._id);
+                const url = process.env.HOST + '/login/' + encodeURI(fileID) + '/' + encodeURI(ct._id);
                 const email = ct.email;
                 // All fields that must replace placeholders in messages
                 const emailContext = {
@@ -1541,7 +1541,7 @@ userRoutes.route('/addComment').post((req, res, next) => {
                       secEmails: result.refUser.map(s => s.email),
                       bank: result.bank
                     };
-                    const url = req.protocol + '://' + req.get('host') + '/login/' + encodeURI(fileID) + '/' + encodeURI(ct._id);
+                    const url = process.env.HOST + '/login/' + encodeURI(fileID) + '/' + encodeURI(ct._id);
                     mailer.commentMade(user.name, ct.email, comment.comment, result.propertyDescription, result.milestoneList.milestones[0]._id.name, url, buildMessage(commentFooter, footerContext));
                   }
                 });
@@ -1559,7 +1559,7 @@ userRoutes.route('/addComment').post((req, res, next) => {
                       secEmails: result.refUser.map(s => s.email),
                       bank: result.bank
                     };
-                    const url = req.protocol + '://' + req.get('host') + '/login/' + encodeURI(fileID) + '/' + encodeURI(ct._id);
+                    const url = process.env.HOST + '/login/' + encodeURI(fileID) + '/' + encodeURI(ct._id);
                     twilioSms.commentMade(ct.cell, comment.comment, user.name, result.propertyDescription, result.milestoneList.milestones[0]._id.name, buildMessage(commentFooter, footerContext));
                   }
                 });
@@ -1618,7 +1618,7 @@ userRoutes.route('/addSummary').post((req, res, next) => {
                       secEmails: result.refUser.map(s => s.email),
                       bank: result.bank
                     };
-                    const url = req.protocol + '://' + req.get('host') + '/login/' + encodeURI(fileID) + '/' + encodeURI(ct._id);
+                    const url = process.env.HOST + '/login/' + encodeURI(fileID) + '/' + encodeURI(ct._id);
                     mailer.summaryAdded(user.name, ct.email, summary.summary, result.propertyDescription, result.fileRef, url, buildMessage(commentFooter, footerContext), result.milestoneList._id.title);
                   }
                 });
@@ -1636,7 +1636,7 @@ userRoutes.route('/addSummary').post((req, res, next) => {
                       secEmails: result.refUser.map(s => s.email),
                       bank: result.bank
                     };
-                    const url = req.protocol + '://' + req.get('host') + '/login/' + encodeURI(fileID) + '/' + encodeURI(ct._id);
+                    const url = process.env.HOST + '/login/' + encodeURI(fileID) + '/' + encodeURI(ct._id);
                     twilioSms.summaryAdded(ct.cell, summary.summary, user.name, result.propertyDescription, result.fileRef, buildMessage(commentFooter, footerContext));
                   }
                 });
@@ -1995,7 +1995,7 @@ userRoutes.route('/upload').post(upload, (req, res, next) => {
         }
       }).populate({path: 'contactID', select: 'name surname'}).exec((er, rd) => {
         if(er) next(er);
-        const link = req.protocol + '://' + req.get('host') + '/admin-home';
+        const link = process.env.HOST + '/admin-home';
         async.each(rd.fileID.refUser, (u, cb) => {
           mailer.docUploaded(rd.contactID.name + ' ' + rd.contactID.surname, u.email, rd.requiredDocumentID.name, rd.fileID.fileRef, rd.fileID.propertyDescription, link)
             .then(() => {

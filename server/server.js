@@ -35,6 +35,7 @@ const mongooseOptions = {
   connectTimeoutMS: 30000,
   socketTimeoutMS : 30000,
   useNewUrlParser: true,
+  useFindAndModify: false,
   ha: true, // Make sure the high availability checks are on
   haInterval: 5000, // Run every 5 seconds,
   useUnifiedTopology: true
@@ -80,6 +81,8 @@ server.listen(port, () => {
 // RESTORE MONGODB to URI DB
 // mongorestore --uri mongodb+srv://<username>:<password>@x.x.mongodb.net/convey_feed convey_feed/ -d convey_feed
 // docker exec -i mongodb /usr/bin/mongorestore --username username --password admin --authenticationDatabase admin --db convey_feed /dump/convey_feed
+// docker exec -i cf_database_1 /usr/bin/mongorestore --username admin --password rootTest1# --authenticationDatabase admin --db convey_feed /dump/convey_feed
 // DEV DB username = username password = admin
 // // aws lightsail push-container-image --region ap-south-1 --service-name conveyfeed --label api --image convey-feed-api:latest
+//
 

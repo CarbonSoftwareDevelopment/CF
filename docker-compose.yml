@@ -6,14 +6,14 @@ services:
       dockerfile: Dockerfile
       context: ./server
     volumes:
-      - /app/node_modules
+      - ./server/uploads:/server/uploads
     env_file: ./server/.env
+    links:
+      - database # link this service to the database service
   client:
     build:
       dockerfile: Dockerfile
       context: ./client
-    volumes:
-      - /app/node_modules
   nginx:
     restart: always
     build:
@@ -21,4 +21,15 @@ services:
       context: ./nginx
     ports:
       - '80:80'
-
+    depends_on:
+      - 'api'
+  database:
+    restart: always
+    image: mongo:4.0.4 # specify image to build container from
+    ports:
+      - "27017:27017" # specify port forewarding
+    volumes:
+      - mongodata:/data/db
+      - ./db/convey_feed:/dump/convey_feed
+volumes:
+  mongodata:
