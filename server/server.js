@@ -46,7 +46,7 @@ mongoose.connect(process.env.DB_URI, mongooseOptions).then(
 );
 const userRoutes = require('./routes/user.route');
 const app = express();
-// new Scheduler(process.env.HOST);
+new Scheduler(process.env.HOST);
 app.use(bodyParser.json());
 app.use(cors());
 const port = process.env.PORT;
