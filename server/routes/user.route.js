@@ -1290,7 +1290,7 @@ userRoutes.route('/adminFile/:id').get((req, res, next) => {
           if(err) callback(err);
           else if(uploads.length > 0) {
             async.each(uploads, (u, cb) => {
-              let fullPath = __dirname + '/../../' + u.path;
+              let fullPath = u.path;
               fs.readFile(fullPath, (er, data) => {
                 if(er) cb(er);
                 else {
@@ -2031,7 +2031,7 @@ userRoutes.route('/contactUploads/:id').get((req, res, next) => {
     if(err) next(err);
     else if(uploads.length > 0) {
       async.each(uploads, (u, cb) => {
-        let fullPath = __dirname + '/../../' + u.path;
+        let fullPath = u.path;
         fs.readFile(fullPath, (er, data) => {
           if(er) cb(er);
           else {
@@ -2074,7 +2074,7 @@ userRoutes.route('/getAllUploads').get((req, res, next) => {
       if(err) next(err);
       else if(uploads.length > 0) {
         async.each(uploads, (u, cb) => {
-          let fullPath = __dirname + '/../../' + u.path;
+          let fullPath = u.path;
           fs.readFile(fullPath, (er, data) => {
             if(er) cb(er);
             else {
@@ -2096,7 +2096,7 @@ userRoutes.route('/getAllUploads').get((req, res, next) => {
     })
 });
 userRoutes.route('/download').post((req, res, next) => {
-  let filePath = path.join(__dirname, '../../uploads/') + req.body.doc;
+  let filePath = path.join('/app/uploads/') + req.body.doc;
   res.sendFile(filePath);
 });
 // ============================ UPLOAD ROUTES  =========================

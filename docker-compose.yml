@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
       context: ./server
     volumes:
-      - ./server/uploads:/server/uploads
+      - stored_docs:/app/uploads
     env_file: ./server/.env
     links:
       - database # link this service to the database service
@@ -33,3 +33,4 @@ services:
       - ./db/convey_feed:/dump/convey_feed
 volumes:
   mongodata:
+  stored_docs:
