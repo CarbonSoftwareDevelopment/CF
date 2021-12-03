@@ -56,7 +56,7 @@ class Mailer {
     let that = this;
 
     // if (process.env.NODE_ENV !== 'development' || ['renaldovd@gmail.com', 'ronnie@georgetown.co.za'].indexOf(toEmail) > -1) {
-      console.log("SENDING EMAIL TO", toEmail);
+      console.log("================= \n SENDING EMAIL TO", toEmail);
       return new Promise((resolve, reject) => {
         this.mailer.sendMail({
           from: that.emailFrom,
@@ -69,8 +69,9 @@ class Mailer {
           if (error) {
             reject(error);
           }
-          console.log(toEmail);
-          console.log(response);
+           if(response && response.accepted) {
+             console.log("SUCCESS : ", response.accepted, "====================\n");
+           }
           that.mailer.close();
           resolve(response);
         });

@@ -30,9 +30,10 @@ class Scheduler {
   scheduleReports (host) {
     let idRegex = /^[a-fA-F0-9]{24}$/;
     let Fridays3pm = '0 15 * * Fri';
+    let MumbaiFriday1pm = '0 13 * * Fri';
     let minute = '* * * * *';
     return new Promise((resolve, reject) => {
-      cron.schedule(Fridays3pm, () => {
+      cron.schedule(MumbaiFriday1pm, () => {
         console.log("Kicking off scheduled weekly updates");
         async.waterfall([
           (cb) => { // get all files in db that are not archived

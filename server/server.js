@@ -85,7 +85,7 @@ server.listen(port, () => {
 // DEV DB username = username password = admin
 // // aws lightsail push-container-image --region ap-south-1 --service-name conveyfeed --label api --image convey-feed-api:latest
 // MONGO TUNNEL
-// ssh -i ~/Downloads/LightsailDefaultKey-ap-south-1.cer -N -f -L 8000:localhost:27017 ec2-user@65.1.135.156
+// ssh -i ~/Downloads/LightsailDefaultKey-ap-south-1.cer -N -f -L 8000:localhost:27017 ec2-user@35.154.173.2
 // Break Tunnel
 // ps aux | grep ssh
 // kill -9 <processid>
