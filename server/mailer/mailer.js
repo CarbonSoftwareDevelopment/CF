@@ -55,9 +55,8 @@ class Mailer {
 
     let that = this;
 
-    if (process.env.NODE_ENV !== 'development' || ['renaldovd@gmail.com', 'ronnie@georgetown.co.za'].indexOf(toEmail) > -1) {
+    // if (process.env.NODE_ENV !== 'development' || ['renaldovd@gmail.com', 'ronnie@georgetown.co.za'].indexOf(toEmail) > -1) {
       console.log("SENDING EMAIL TO", toEmail);
-      console.log("SENDING EMAIL FROM ", that.emailFrom);
       return new Promise((resolve, reject) => {
         this.mailer.sendMail({
           from: that.emailFrom,
@@ -76,8 +75,8 @@ class Mailer {
           resolve(response);
         });
       });
-    }
-    return new Promise(resolve => resolve());
+    // }
+    // return new Promise(resolve => resolve());
   }
 
   //Helper function to determine if word starts with a vowel
