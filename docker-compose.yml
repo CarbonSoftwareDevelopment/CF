@@ -10,6 +10,13 @@ services:
     env_file: ./server/.env
     links:
       - database # link this service to the database service
+  birthday_cron:
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: ./micro_services/birthday_cron
+    depends_on:
+      - 'nginx'
   client:
     build:
       dockerfile: Dockerfile

@@ -30,11 +30,15 @@ class Scheduler {
   scheduleReports (host) {
     let idRegex = /^[a-fA-F0-9]{24}$/;
     let Fridays3pm = '0 15 * * Fri';
-    let MumbaiFriday1pm = '0 13 * * Fri';
+    // Mumbai server is 2 hours behind - send updates Friday 4pm our time
+    // That is 2pm Mumbai time
+    let MumbaiFriday2pmforSA4pm = '0 14 * * Fri';
     let minute = '* * * * *';
+    let now = new Date();
+    now = now.toLocaleDateString();
     return new Promise((resolve, reject) => {
-      cron.schedule(MumbaiFriday1pm, () => {
-        console.log("Kicking off scheduled weekly updates");
+      cron.schedule(MumbaiFriday2pmforSA4pm, () => {
+        console.log(`[${now}] - `, "Kicking off scheduled weekly updates");
         async.waterfall([
           (cb) => { // get all files in db that are not archived
             File.find({archived: {$ne : true}})
