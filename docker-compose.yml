@@ -41,3 +41,8 @@ services:
 volumes:
   mongodata:
   stored_docs:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '${PWD}/server/uploads'

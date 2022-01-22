@@ -5,7 +5,7 @@ const cron = require('node-cron');
   const mumbai6amforSA8am = '0 6 * * *';
   let sec30 = '* * * * *';
   let now = new Date();
-  now = now.toLocaleDateString();
+  now = now.toLocaleString();
   cron.schedule(mumbai6amforSA8am, () => {
     console.log(`[${now}] - `, 'Sending Birthday Messages.');
     axios.get(`http://nginx/api/user/happyBirthdayContacts`).then(res => {

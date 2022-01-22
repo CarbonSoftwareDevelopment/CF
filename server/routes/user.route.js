@@ -1291,7 +1291,8 @@ userRoutes.route('/adminFile/:id').get((req, res, next) => {
           else if(uploads.length > 0) {
             async.each(uploads, (u, cb) => {
               let fullPath = u.path;
-              fs.readFile(fullPath, (er, data) => {
+              let linuxPath = 'uploads/' + u.name;
+              fs.readFile(linuxPath, (er, data) => {
                 if(er) cb(er);
                 else {
                   if (u.mimeType.split('/')[0] === 'image') {

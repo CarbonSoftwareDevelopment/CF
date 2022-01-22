@@ -80,13 +80,16 @@ server.listen(port, () => {
 
 // RESTORE MONGODB to URI DB
 // mongorestore --uri mongodb+srv://<username>:<password>@x.x.mongodb.net/convey_feed convey_feed/ -d convey_feed
+// mongorestore --uri mongodb://localhost:27017 convey_feed/ -d convey_feed (when tunnel created on local port 27017)
 // docker exec -i mongodb /usr/bin/mongorestore --username username --password admin --authenticationDatabase admin --db convey_feed /dump/convey_feed
 // docker exec -i cf_database_1 /usr/bin/mongorestore --db convey_feed /dump/convey_feed
 // DEV DB username = username password = admin
-// // aws lightsail push-container-image --region ap-south-1 --service-name conveyfeed --label api --image convey-feed-api:latest
+// aws lightsail push-container-image --region ap-south-1 --service-name conveyfeed --label api --image convey-feed-api:latest
 // MONGO TUNNEL
 // ssh -i ~/Downloads/LightsailDefaultKey-ap-south-1.cer -N -f -L 8000:localhost:27017 ec2-user@35.154.173.2
 // Break Tunnel
 // ps aux | grep ssh
 // kill -9 <processid>
+// COPY SCP
+// scp -i /Users/renaldo/Downloads/LightsailDefaultKey-ap-south-1.cer -r ~/Downloads/uploads ec2-user@35.154.173.2:
 
