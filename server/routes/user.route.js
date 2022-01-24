@@ -737,7 +737,7 @@ userRoutes.route('/updateContact').post((req, res, next) => {
   const ct = req.body;
   let birthday = new Date(ct.dob);
   ct.birthmonth = birthday.getMonth() + 1;
-  ct.birthday = birthday.getDate();
+  ct.birthday = birthday.getDate() + 1; // DATE is UTC and 22:00 of previous day, yhuss add one day.
   if (ct.email === "" || ct.email === null) {
     delete ct.email;
   } else {
