@@ -46,7 +46,7 @@ mongoose.connect(process.env.DB_URI, mongooseOptions).then(
 );
 const userRoutes = require('./routes/user.route');
 const app = express();
-new Scheduler(process.env.HOST);
+const scheduler = new Scheduler(process.env.HOST);
 app.use(bodyParser.json());
 app.use(cors());
 const port = process.env.PORT;
@@ -62,6 +62,14 @@ app.use((err, req, res, next) => {
   });
 });
 app.use('/user', userRoutes);
+app.route('/send/updates/pass/:pass').get((req, res, next) => {
+  res.send("API WORKS.");
+  const pass = req.params.pass;
+
+  if (pass === process.env.UPDATES_PASSWORD) {
+    scheduler.sendUpdates();
+  }
+});
 app.all('*', (req, res, next) => {
 
   const err = new Error(`Can't find ${req.originalUrl} on this server!`);
@@ -92,4 +100,3 @@ server.listen(port, () => {
 // kill -9 <processid>
 // COPY SCP
 // scp -i /Users/renaldo/Downloads/LightsailDefaultKey-ap-south-1.cer -r ~/Downloads/uploads ec2-user@35.154.173.2:
-

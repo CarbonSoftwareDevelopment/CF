@@ -3,12 +3,13 @@ const smtpttransport = require('nodemailer-smtp-transport');
 const hbs = require('nodemailer-express-handlebars');
 const inlineBase64 = require('nodemailer-plugin-inline-base64');
 const EmailError = require('./EmailError');
-const TimeAgo = require('javascript-time-ago');
-const en = require('javascript-time-ago/locale/en');
-TimeAgo.addLocale(en);
-const timeAgo = new TimeAgo('en-US');
 
 class Mailer {
+
+  formatDate = (dateString) => {
+    const options = { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "numeric" };
+    return new Date(dateString).toLocaleDateString(undefined, options)
+  }
 
   constructor(host, port, emailFrom, password, username) {
     console.log(`MAILER CREATED WTH host: ${host} port: ${port} emailFrom: ${emailFrom} password: ${password} username: ${username}`);
@@ -219,9 +220,9 @@ class Mailer {
     if (file.summaries) {
       file.summaries.forEach((s, i) => {
         newSummaries.push({
-          timeAgo: timeAgo.format(s.timestamp),
+          date: this.formatDate(s.timestamp),
           summary: s.summary,
-          user: {name: s.user.name}
+          user: {name: s.user?.name}
         });
       });
     } else {

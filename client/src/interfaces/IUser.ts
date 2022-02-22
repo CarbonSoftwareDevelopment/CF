@@ -9,6 +9,6 @@ export interface IUser {
     token: string;
     expiry: Date;
   };
+  company: string;
   fileIDs?: [string];
 }
-

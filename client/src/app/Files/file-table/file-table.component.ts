@@ -504,26 +504,26 @@ export class FileTableComponent implements OnInit {
 export interface File {
   _id: string;
   fileRef: string;
-  action: string;
-  refUser: [any];
-  uploads?: [any];
+  action?: string;
+  refUser: any[];
+  uploads?: any[];
   milestoneList?: MilestoneList;
-  contacts?: [any];
+  contacts?: any[];
   propertyDescription: string;
   updatedBy: any;
   createdBy: any;
   updatedAt: any;
   createdAt: any;
   archived: boolean;
-  archivedAt: Date;
+  archivedAt?: Date;
   entity?: any;
-  _v: any;
+  _v?: any;
   requiredDocuments?: any;
   fullFile?: boolean;
 }
 export interface MilestoneList {
   _id: any;
-  milestones: [Milestone];
+  milestones?: Milestone[];
 }
 
 export interface Milestone {
@@ -535,9 +535,9 @@ export interface Milestone {
   sendSms: boolean;
   updatedAt: any;
   updatedBy: any;
-  comments: [{
+  comments: {
     user: any;
     comment: string;
-  }];
+  }[];
   completed: boolean;
 }

@@ -1529,6 +1529,7 @@ userRoutes.route('/addComment').post((req, res, next) => {
             else {
               comment.user = user;
               let commentFooter = user.properties ? user.properties.commentMailFooter : user.companyAdmin.properties.commentMailFooter;
+              commentFooter = commentFooter ? commentFooter : ''
               if (sendNoti.email && emailContacts.length > 0) { // if send email true and contacts selected
                 emailContacts.forEach(ct => {
                   if (ct.email) {
@@ -1606,6 +1607,7 @@ userRoutes.route('/addSummary').post((req, res, next) => {
             else {
               summary.user = user;
               let commentFooter = user.properties ? user.properties.commentMailFooter : user.companyAdmin.properties.commentMailFooter;
+              commentFooter = commentFooter ? commentFooter : ''
               if (sendNoti.email && emailContacts.length > 0) { // if send email true and contacts selected
                 emailContacts.forEach(ct => {
                   if (ct.email) {
@@ -2123,6 +2125,8 @@ function find(items, text) {
   });
 }
 function buildMessage(body, context) {
+  console.log(body)
+  console.log(context)
   let resultMessage = body.split('*deeds_office*').join(context.deedsOffice);
   resultMessage = resultMessage.split('*property_description*').join(context.propertyDescription);
   resultMessage = resultMessage.split('*my_name*').join(context.myName);

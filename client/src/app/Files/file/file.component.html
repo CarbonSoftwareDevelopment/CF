@@ -25,7 +25,7 @@
               <mat-card-header>
                 <mat-card-title style="justify-content: space-between">
                   <i class="fas fa-user-tie"></i>
-                  {{user.name + ' ' + user.surname}}
+                  {{user?.name + ' ' + user?.surname}}
                 </mat-card-title>
                 <mat-card-subtitle>
                   <small><i class="fas fa-user-friends"></i> Conveyancing Secretary</small>
@@ -79,7 +79,7 @@
                                         <span style="color:red">Last comment:</span>
                                         <i class="fas fa-user-tie"></i> <span style="font-weight: bold; color: darkslategray"> {{milestone.comments[milestone.comments.length - 1]?.user?.name}}</span>
                                         <div class="speech">
-                                          {{milestone.comments[milestone.comments.length - 1]?.comment}}<small style="color: #888888"> {{milestone.comments[milestone.comments.length - 1]?.timestamp | amTimeAgo}}</small>
+                                          {{milestone.comments[milestone.comments.length - 1]?.comment}}<small style="color: #888888"> {{milestone.comments[milestone.comments.length - 1]?.timestamp | date:"MMM d, y, h:mm"}}</small>
                                         </div>
                                         <br>
                                       </small>
@@ -98,10 +98,10 @@
                   <span *ngIf="milestone.comments < 1">No comments to display</span>
                   <div class="comment" *ngFor="let c of milestone.comments">
                     <i class="fas fa-user-tie"></i> <span
-                    style="font-weight: bold; color: darkslategray"> {{c.user.name}}</span>
+                    style="font-weight: bold; color: darkslategray"> {{c.user?.name}}</span>
                     <div class="speech">
                       {{c.comment}}
-                      <small style="color: #888888"> {{c.timestamp | amTimeAgo}}</small>
+                      <small style="color: #888888"> {{c.timestamp | date:"MMM d, y, h:mm"}}</small>
                     </div>
                   </div>
 
@@ -124,8 +124,8 @@
           <div class="col-12" style="padding-top: 20px; padding-bottom: 20px;">
             <div class="row" *ngFor="let summary of file.summaries; let i = index;" style="width: 80%; margin-left: 10%;">
               <div class="col-3">
-                <span style="font-weight: bold; color: dimgray"><i class="fas fa-user-tie"></i> &nbsp;{{summary.user.name}}</span>
-                <small style="color: #888888; float: right"> {{summary.timestamp | amTimeAgo}}</small>
+                <span style="font-weight: bold; color: dimgray"><i class="fas fa-user-tie"></i> &nbsp;{{summary.user?.name}}</span>
+                <small style="color: #888888; float: right"> {{summary.timestamp | date:"MMM d, y, h:mm"}}</small>
               </div>
               <div class="col-9" style="background-color: #F5F5F5; padding: 0px 8px 0px 8px; color: darkslategrey; font-size: 15px;"
                    [ngStyle]="{'border-radius' : i === 0 ? '10px 10px 0px 0px' : i === file.summaries.length - 1 ? '0px 0px 10px 10px' : ''}">

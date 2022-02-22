@@ -1,0 +1,25 @@
+version: "3.8"
+services:
+  api:
+    restart: always
+    build:
+      context: ./server
+    volumes:
+      - /app/node_modules
+      - ./server:/app
+    env_file: ./server/.env
+    links:
+      - database # link this service to the database service
+    ports:
+      - "4000:4000"
+    command: npm run dev
+  database:
+    restart: always
+    image: mongo:4.0.4 # specify image to build container from
+    ports:
+      - "27017:27017" # specify port forewarding
+    volumes:
+      - mongodata:/data/db
+      - ./db/convey_feed:/dump/convey_feed
+volumes:
+  mongodata:
