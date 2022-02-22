@@ -85,7 +85,7 @@
                                 <mat-panel-description>
                                   <small style="color: darkgrey">
                                     Last Updated: {{formatDate(milestone.updatedAt)}} <br>by
-                                    {{milestone.updatedBy.name}}
+                                    {{milestone.updatedBy?.name}}
                                   </small>
                                   <h4><i class="far fa{{milestone.completed ? '-check' : ''}}-square"></i></h4>
                                 </mat-panel-description>
